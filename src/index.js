@@ -22,41 +22,44 @@ function formatDate(date) {
   
     return `${day} ${hours}:${minutes}`;
   }
-  let cityInput;
   let apiKey = "5f472b7acba333cd8a035ea85a0d4d4c";
   let units = "metric";
   let apiUrl;
   
   function displayWeather(response) {
-    //let cityElement = response.data.name;
-    //cityInput = document.querySelector("#city");
-    //cityInput.innerHTML = cityElement;
-  
     document.querySelector("#city").innerHTML = response.data.name;
+
+    let weather = response.data.weather[0].description;
+    let weatherLi = document.querySelector("#weather");
+    weatherLi.innerHTML = weather.charAt(0).toUpperCase() + weather.slice(1);
   
-    let temperature = Math.round(response.data.main.temp);
-    let tempSpan = document.querySelector("#temperature");
-    tempSpan.innerHTML = temperature;
+    let weekDay = response.data.timezone;
+    let localTime = new Date(new Date().getTime() + weekDay * 1000);
+    let dateElement = document.querySelector("#date");
+    dateElement.innerHTML = formatDate(localTime);
   
     let humidityLi = response.data.main.humidity;
     let hum = document.querySelector("#humidity");
-    hum.innerHTML = humidityLi + " %";
+    hum.innerHTML = "Humidity: " + humidityLi + " %";
   
     let wind = Math.round(response.data.wind.speed);
     let windLi = document.querySelector("#wind");
-    windLi.innerHTML = wind + " km/h";
-  
-    let weather = response.data.weather[0].description;
-    let weatherLi = document.querySelector("#weather");
-    weatherLi.innerHTML = weather;
+    windLi.innerHTML = "Wind: " + wind + " km/h";
+
+    let temperature = Math.round(response.data.main.temp);
+    let tempSpan = document.querySelector("#temperature");
+    tempSpan.innerHTML = temperature + "<label class='units'>°C</label>";
+
+    let weatherIcon = response.data.weather[0].icon;
+    let weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIcon}.png`;
+    let weatherIconElement = document.querySelector("#weather-icon");
+    weatherIconElement.innerHTML = `<img src="${weatherIconUrl}" alt="Weather Icon" width= 88 height= 88 >`;
+
   }
   
   function search(event) {
     event.preventDefault();
     let searchCity = document.querySelector("#search-form-input");
-    let dateElement = document.querySelector("#date");
-    let currentTime = new Date();
-    dateElement.innerHTML = formatDate(currentTime);
     apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity.value}&appid=${apiKey}&units=${units}`;
   
     axios.get(apiUrl).then(displayWeather);
@@ -84,21 +87,7 @@ function formatDate(date) {
     let long = position.coords.longitude;
     apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=${apiKey}&units=${units}`;
   
-    axios
-      .get(apiUrl)
-      .then(function (response) {
-        displayWeather(response);
-  
-        // Adiciona a data ao elemento com id "date"
-        let dateElement = document.querySelector("#date");
-        let currentTime = new Date();
-        dateElement.innerHTML = formatDate(currentTime);
-      })
-      .catch(function (error) {
-        console.error("Erro na chamada da API:", error);
-      });
+    axios.get(apiUrl).then(displayWeather);
+
   }
-  
-  let button = document.querySelector("#current-location-button");
-  button.addEventListener("click", getCurrentPosition);
   
