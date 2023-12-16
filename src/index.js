@@ -40,11 +40,11 @@ function formatDate(date) {
   
     let humidityLi = response.data.main.humidity;
     let hum = document.querySelector("#humidity");
-    hum.innerHTML = "Humidity: " + humidityLi + " %";
+    hum.innerHTML = "<strong>Humidity:</strong> " + humidityLi + " %";
   
     let wind = Math.round(response.data.wind.speed);
     let windLi = document.querySelector("#wind");
-    windLi.innerHTML = "Wind: " + wind + " km/h";
+    windLi.innerHTML = "<strong>Wind:</strong> " + wind + " km/h";
 
     let temperature = Math.round(response.data.main.temp);
     let tempSpan = document.querySelector("#temperature");
