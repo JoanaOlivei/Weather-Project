@@ -45,7 +45,14 @@ function search(event) {
   let searchCity = document.querySelector("#search-form-input");
   apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity.value}&appid=${apiKey}&units=${units}`;
 
-  axios.get(apiUrl).then(displayWeather);
+  axios.get(apiUrl)
+    .then(displayWeather)
+    .catch(function (error) {
+      alert("Failed to fetch weather data. Please try again later.");
+      console.error("Error fetching weather data:", error);
+    });
+
+/* axios.get(apiUrl).then(displayWeather);
 
   axios
     .get(apiUrl)
@@ -54,7 +61,8 @@ function search(event) {
     })
     .catch(function (error) {
       alert("This city doesn't exist!", error);
-    });
+    }); 
+    */
 }
 
 function formatDate(timestamp) {
@@ -136,7 +144,7 @@ function displayForecast(response) {
   const forecastData = response.data;
 
   if (forecastData && forecastData.daily) {
-    let forecastHtml = "<div class='row weather-forescast' >";
+    let forecastHtml = "<div class='row' >";
 
     forecastData.daily.slice(1, 6).forEach(function (day) {
       // Note que agora estamos usando .slice(1, 6) para obter os próximos 5 dias, excluindo o atual.
