@@ -6,38 +6,59 @@ function displayWeather(response) {
   const weatherData = response.data;
 
   console.log("Received weather data:", weatherData);
+ // console.log("ola: ",weatherData.daily.length);
 
-  const today = weatherData.daily[0];
-  document.querySelector("#city").innerHTML = weatherData.name;
+  /*if (weatherData && weatherData.daily && weatherData.daily.length > 0) {*/
 
-  const weather = today.weather[0].description;
-  const weatherLi = document.querySelector("#weather");
-  weatherLi.innerHTML = weather.charAt(0).toUpperCase() + weather.slice(1);
+    const today = weatherData.daily[0];
+    document.querySelector("#city").innerHTML = weatherData.name;
 
-  const localTime = new Date(today.dt * 1000 + weatherData.timezone_offset * 1000);
-  const dateElement = document.querySelector("#date");
-  dateElement.innerHTML = formatDate(localTime);
+    const weather = today.weather[0].description;
+    const weatherLi = document.querySelector("#weather");
+    weatherLi.innerHTML = weather.charAt(0).toUpperCase() + weather.slice(1);
 
-  const humidityLi = today.humidity;
-  const hum = document.querySelector("#humidity");
-  hum.innerHTML = "<strong>Humidity:</strong> " + humidityLi + " %";
+    const localTime = new Date(today.dt * 1000 + weatherData.timezone_offset * 1000);
+    const dateElement = document.querySelector("#date");
+    dateElement.innerHTML = formatDate(localTime);
 
-  const wind = Math.round(today.wind_speed);
-  const windLi = document.querySelector("#wind");
-  windLi.innerHTML = "<strong>Wind:</strong> " + wind + " km/h";
+    const humidityLi = today.humidity;
+    const hum = document.querySelector("#humidity");
+    hum.innerHTML = "<strong>Humidity:</strong> " + humidityLi + " %";
 
-  const temperature = Math.round(today.temp.day);
-  const tempSpan = document.querySelector("#temperature");
-  tempSpan.innerHTML = temperature + "<label class='units'>°C</label>";
+    const wind = Math.round(today.wind_speed);
+    const windLi = document.querySelector("#wind");
+    windLi.innerHTML = "<strong>Wind:</strong> " + wind + " km/h";
 
-  const weatherIcon = today.weather[0].icon;
-  const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIcon}.png`;
-  const weatherIconElement = document.querySelector("#weather-icon");
-  weatherIconElement.innerHTML = `<img src="${weatherIconUrl}" alt="Weather Icon" width= 88 height= 88 >`;
+    const temperature = Math.round(today.temp.day);
+    const tempSpan = document.querySelector("#temperature");
+    tempSpan.innerHTML = temperature + "<label class='units'>°C</label>";
+
+    const weatherIcon = today.weather[0].icon;
+    const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIcon}.png`;
+    const weatherIconElement = document.querySelector("#weather-icon");
+    weatherIconElement.innerHTML = `<img src="${weatherIconUrl}" alt="Weather Icon" width= 88 height= 88 >`;
+ /* } else {
+    console.error("Invalid weather data structure.");
+  }*/
 }
 
 function search(event) {
-  event.preventDefault();
+  /*event.preventDefault();
+  let searchCity = document.querySelector("#search-form-input");
+  apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity.value}&appid=${apiKey}&units=${units}`;
+
+ //axios.get(apiUrl).then(displayWeather);
+
+  axios
+    .get(apiUrl)
+    .then(function (response) {
+      displayWeather(response);
+    })
+    .catch(function (error) {
+      alert("This city doesn't exist!", error);
+    }); */
+
+    event.preventDefault();
   let searchCity = document.querySelector("#search-form-input").value;
   
   if (!searchCity) {
@@ -59,11 +80,11 @@ function search(event) {
         console.error("Error fetching weather data:", error);
       }
     }); 
+    
 }
 
-// Função de formatação de data
 function formatDate(timestamp) {
-  let date = new Date(timestamp); 
+  let date = new Date(timestamp); // Agora estamos utilizando diretamente o timestamp
 
   let hours = date.getHours();
   if (hours < 10) {
@@ -89,12 +110,15 @@ function formatDate(timestamp) {
   return `${day} ${hours}:${minutes}`;
 }
 
-// Obtém a posição atual
+getCurrentPosition();
+
 function getCurrentPosition() {
   navigator.geolocation.getCurrentPosition(showPosition);
 }
 
-// Exibe os resultados da pesquisa de posição
+let searchForm = document.querySelector("#search-form");
+searchForm.addEventListener("submit", search);
+
 function showPosition(position) {
   let lat = position.coords.latitude;
   let lon = position.coords.longitude;
@@ -134,9 +158,35 @@ function showPosition(position) {
     });
 }
 
-// Adiciona o evento de envio ao formulário de pesquisa
-let searchForm = document.querySelector("#search-form");
-searchForm.addEventListener("submit", search);
+function displayForecast(response) {
+  const forecastData = response.data;
 
-// Obtém a posição atual ao carregar a página
-getCurrentPosition();
+  if (forecastData && forecastData.daily) {
+    let forecastHtml = "<div class='row' >";
+
+    forecastData.daily.slice(1, 6).forEach(function (day) {
+      // Note que agora estamos usando .slice(1, 6) para obter os próximos 5 dias, excluindo o atual.
+
+      forecastHtml +=
+        `
+          <div class="weather-forecast-day">
+            <div class="weather-forecast-date">${formatDate(day.dt * 1000)}</div>
+            <img src="http://openweathermap.org/img/wn/${day.weather[0].icon}.png" class="weather-forecast-icon" />
+            <div class="weather-forecast-temperatures">
+              <div class="weather-forecast-temperature">
+                <strong>${Math.round(day.temp.max)}º</strong>
+              </div>
+              <div class="weather-forecast-temperature">${Math.round(day.temp.min)}º</div>
+            </div>
+          </div>
+        `;
+    });
+
+    forecastHtml += "</div>";
+
+    const forecastElement = document.querySelector("#forecast");
+    forecastElement.innerHTML = forecastHtml;
+  } else {
+    console.error("Invalid forecast data structure.");
+  }
+}
