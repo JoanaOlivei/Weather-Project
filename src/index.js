@@ -8,7 +8,8 @@ function displayWeather(response) {
   console.log("Received weather data:", weatherData);
   console.log("ola: ",weatherData.daily.length);
 
-  if (weatherData && weatherData.daily && weatherData.daily.length > 0) {
+  /*if (weatherData && weatherData.daily && weatherData.daily.length > 0) {*/
+  if (weatherData && weatherData.daily) {
     const today = weatherData.daily[0];
     document.querySelector("#city").innerHTML = weatherData.name;
 
@@ -56,7 +57,7 @@ function search(event) {
     .catch(function (error) {
       alert("This city doesn't exist!", error);
     }); 
- 
+    
 }
 
 function formatDate(timestamp) {
