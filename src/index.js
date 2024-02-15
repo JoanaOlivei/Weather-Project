@@ -46,14 +46,7 @@ function search(event) {
   let searchCity = document.querySelector("#search-form-input");
   apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity.value}&appid=${apiKey}&units=${units}`;
 
-  axios.get(apiUrl)
-    .then(displayWeather)
-    .catch(function (error) {
-      alert("Failed to fetch weather data. Please try again later.");
-      console.error("Error fetching weather data:", error);
-    });
-
-/* axios.get(apiUrl).then(displayWeather);
+ axios.get(apiUrl).then(displayWeather);
 
   axios
     .get(apiUrl)
@@ -63,7 +56,7 @@ function search(event) {
     .catch(function (error) {
       alert("This city doesn't exist!", error);
     }); 
-    */
+ 
 }
 
 function formatDate(timestamp) {
