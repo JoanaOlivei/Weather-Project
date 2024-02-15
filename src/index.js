@@ -43,7 +43,7 @@ function displayWeather(response) {
 }
 
 function search(event) {
-  event.preventDefault();
+  /*event.preventDefault();
   let searchCity = document.querySelector("#search-form-input");
   apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity.value}&appid=${apiKey}&units=${units}`;
 
@@ -56,6 +56,29 @@ function search(event) {
     })
     .catch(function (error) {
       alert("This city doesn't exist!", error);
+    }); */
+
+    event.preventDefault();
+  let searchCity = document.querySelector("#search-form-input").value;
+  
+  if (!searchCity) {
+    alert("Please enter a city name.");
+    return;
+  }
+
+  apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity}&appid=${apiKey}&units=${units}`;
+
+  axios.get(apiUrl)
+    .then(function (response) {
+      displayWeather(response);
+    })
+    .catch(function (error) {
+      if (error.response && error.response.status === 404) {
+        alert("City not found. Please enter a valid city name.");
+      } else {
+        alert("Failed to fetch weather data. Please try again later.");
+        console.error("Error fetching weather data:", error);
+      }
     }); 
     
 }
