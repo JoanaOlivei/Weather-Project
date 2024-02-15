@@ -136,7 +136,7 @@ function displayForecast(response) {
   const forecastData = response.data;
 
   if (forecastData && forecastData.daily) {
-    let forecastHtml = "";
+    let forecastHtml = "<div class='row'>";
 
     forecastData.daily.slice(1, 6).forEach(function (day) {
       // Note que agora estamos usando .slice(1, 6) para obter os próximos 5 dias, excluindo o atual.
@@ -156,6 +156,8 @@ function displayForecast(response) {
         `;
     });
 
+    forecastHtml += "</div>";
+    
     const forecastElement = document.querySelector("#forecast");
     forecastElement.innerHTML = forecastHtml;
   } else {
