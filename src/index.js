@@ -6,40 +6,35 @@ function displayWeather(response) {
   const weatherData = response.data;
 
   console.log("Received weather data:", weatherData);
- // console.log("ola: ",weatherData.daily.length);
 
-  /*if (weatherData && weatherData.daily && weatherData.daily.length > 0) {*/
+  const cityName = weatherData.name;
+  document.querySelector("#city").innerHTML = cityName;
 
-    const today = weatherData.daily[0];
-    document.querySelector("#city").innerHTML = weatherData.name;
+  const weatherDescription = weatherData.weather[0].description;
+  const weatherLi = document.querySelector("#weather");
+  weatherLi.innerHTML = weatherDescription.charAt(0).toUpperCase() + weatherDescription.slice(1);
 
-    const weather = today.weather[0].description;
-    const weatherLi = document.querySelector("#weather");
-    weatherLi.innerHTML = weather.charAt(0).toUpperCase() + weather.slice(1);
+  const localTime = new Date(weatherData.dt * 1000);
+  const dateElement = document.querySelector("#date");
+  dateElement.innerHTML = formatDate(localTime);
 
-    const localTime = new Date(today.dt * 1000 + weatherData.timezone_offset * 1000);
-    const dateElement = document.querySelector("#date");
-    dateElement.innerHTML = formatDate(localTime);
+  const humidity = weatherData.main.humidity;
+  const humidityLi = document.querySelector("#humidity");
+  humidityLi.innerHTML = "<strong>Humidity:</strong> " + humidity + " %";
 
-    const humidityLi = today.humidity;
-    const hum = document.querySelector("#humidity");
-    hum.innerHTML = "<strong>Humidity:</strong> " + humidityLi + " %";
+  const windSpeed = Math.round(weatherData.wind.speed);
+  const windLi = document.querySelector("#wind");
+  windLi.innerHTML = "<strong>Wind:</strong> " + windSpeed + " km/h";
 
-    const wind = Math.round(today.wind_speed);
-    const windLi = document.querySelector("#wind");
-    windLi.innerHTML = "<strong>Wind:</strong> " + wind + " km/h";
+  const temperature = Math.round(weatherData.main.temp);
+  const tempSpan = document.querySelector("#temperature");
+  tempSpan.innerHTML = temperature + "<label class='units'>°C</label>";
 
-    const temperature = Math.round(today.temp.day);
-    const tempSpan = document.querySelector("#temperature");
-    tempSpan.innerHTML = temperature + "<label class='units'>°C</label>";
+  const weatherIcon = weatherData.weather[0].icon;
+  const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIcon}.png`;
+  const weatherIconElement = document.querySelector("#weather-icon");
+  weatherIconElement.innerHTML = `<img src="${weatherIconUrl}" alt="Weather Icon" width= 88 height= 88 >`;
 
-    const weatherIcon = today.weather[0].icon;
-    const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIcon}.png`;
-    const weatherIconElement = document.querySelector("#weather-icon");
-    weatherIconElement.innerHTML = `<img src="${weatherIconUrl}" alt="Weather Icon" width= 88 height= 88 >`;
- /* } else {
-    console.error("Invalid weather data structure.");
-  }*/
 }
 
 function search(event) {
