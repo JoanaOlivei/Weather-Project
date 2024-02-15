@@ -6,6 +6,7 @@ function displayWeather(response) {
   const weatherData = response.data;
 
   console.log("Received weather data:", weatherData);
+  console.log(weatherData.daily);
 
   if (weatherData && weatherData.daily && weatherData.daily.length > 0) {
     const today = weatherData.daily[0];
