@@ -5,8 +5,6 @@ let apiUrl;
 function displayWeather(response) {
   const weatherData = response.data;
 
-  console.log("Received weather data:", weatherData);
-
 if (weatherData.daily) {
     const today = weatherData.daily[0];
     document.querySelector("#city").innerHTML = weatherData.name;
