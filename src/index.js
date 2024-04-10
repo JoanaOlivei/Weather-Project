@@ -104,7 +104,7 @@ function search(event) {
 function formatDate(timestamp) {
   let date = new Date(timestamp); 
 
-  let hours = date.getHours();
+  let hours = date.getHours() + 1;
   if (hours < 10) {
     hours = `0${hours}`;
   }
