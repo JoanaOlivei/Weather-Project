@@ -53,3 +53,19 @@ body {
   {
     display: flex;
   }
+
+  .weather-forecast-day  
+  {
+    margin-right: 10px;
+    text-align: center;
+  }
+
+  .weather-forecast-temperature
+  {
+    text-align: center;
+  }
+
+  .weather-forecast-icon
+  {
+    margin: 10px;
+  }

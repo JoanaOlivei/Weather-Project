@@ -6,10 +6,8 @@ function displayWeather(response) {
   const weatherData = response.data;
 
   console.log("Received weather data:", weatherData);
- // console.log("ola: ",weatherData.daily.length);
 
-  /*if (weatherData && weatherData.daily && weatherData.daily.length > 0) {*/
-
+if (weatherData.daily) {
     const today = weatherData.daily[0];
     document.querySelector("#city").innerHTML = weatherData.name;
 
@@ -37,28 +35,39 @@ function displayWeather(response) {
     const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIcon}.png`;
     const weatherIconElement = document.querySelector("#weather-icon");
     weatherIconElement.innerHTML = `<img src="${weatherIconUrl}" alt="Weather Icon" width= 88 height= 88 >`;
- /* } else {
-    console.error("Invalid weather data structure.");
-  }*/
+  }else{
+    document.querySelector("#city").innerHTML = weatherData.name;
+
+    const weather = weatherData.weather[0].description;
+    const weatherLi = document.querySelector("#weather");
+    weatherLi.innerHTML = weather.charAt(0).toUpperCase() + weather.slice(1);
+
+    const humidityLi = weatherData.main.humidity;
+    const hum = document.querySelector("#humidity");
+    hum.innerHTML = "<strong>Humidity:</strong> " + humidityLi + " %";
+
+    const wind = Math.round(weatherData.wind.speed);
+    const windLi = document.querySelector("#wind");
+    windLi.innerHTML = "<strong>Wind:</strong> " + wind + " km/h";
+
+    const temperature = Math.round(weatherData.main.temp);
+    const tempSpan = document.querySelector("#temperature");
+    tempSpan.innerHTML = temperature + "<label class='units'>°C</label>";
+
+    const forecastNull = document.querySelector("#forecast");
+    //forecastNull.innerHTML = "";
+
+    const weatherIcon = weatherData.weather[0].icon;
+    const weatherIconUrl = `http://openweathermap.org/img/wn/${weatherIcon}.png`;
+    const weatherIconElement = document.querySelector("#weather-icon");
+    weatherIconElement.innerHTML = `<img src="${weatherIconUrl}" alt="Weather Icon" width= 88 height= 88 >`;
+
+  }
+
 }
 
 function search(event) {
-  /*event.preventDefault();
-  let searchCity = document.querySelector("#search-form-input");
-  apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchCity.value}&appid=${apiKey}&units=${units}`;
-
- //axios.get(apiUrl).then(displayWeather);
-
-  axios
-    .get(apiUrl)
-    .then(function (response) {
-      displayWeather(response);
-    })
-    .catch(function (error) {
-      alert("This city doesn't exist!", error);
-    }); */
-
-    event.preventDefault();
+  event.preventDefault();
   let searchCity = document.querySelector("#search-form-input").value;
   
   if (!searchCity) {
@@ -71,6 +80,17 @@ function search(event) {
   axios.get(apiUrl)
     .then(function (response) {
       displayWeather(response);
+      const cityForecastUrl = `https://api.openweathermap.org/data/2.5/onecall?lat=${response.data.coord.lat}&lon=${response.data.coord.lon}&exclude=current,minutely,hourly&appid=${apiKey}&units=${units}`;
+
+      axios.get(cityForecastUrl)
+        .then(function (forecastResponse) {
+          displayForecast(forecastResponse);
+          document.querySelector("#search-form-input").value = "";
+        })
+        .catch(function (error) {
+          console.error("Error fetching city forecast data:", error);
+          alert("Failed to fetch city forecast data. Please try again later.");
+        });
     })
     .catch(function (error) {
       if (error.response && error.response.status === 404) {
@@ -79,18 +99,21 @@ function search(event) {
         alert("Failed to fetch weather data. Please try again later.");
         console.error("Error fetching weather data:", error);
       }
-    }); 
-    
+    });
 }
 
+
 function formatDate(timestamp) {
-  let date = new Date(timestamp); // Agora estamos utilizando diretamente o timestamp
+  let date = new Date(timestamp); 
 
   let hours = date.getHours();
   if (hours < 10) {
     hours = `0${hours}`;
   }
-  let minutes = date.getMinutes();
+  
+  let dateMinutes = new Date();
+  let minutes = dateMinutes.getMinutes();
+
   if (minutes < 10) {
     minutes = `0${minutes}`;
   }
@@ -107,7 +130,23 @@ function formatDate(timestamp) {
   ];
   let day = days[dayIndex];
 
-  return `${day} ${hours}:${minutes}`;
+  return ` ${day} ${hours}:${minutes}`;
+}
+
+function formatDay(timestamp){
+  let date = new Date(timestamp); 
+  let dayIndex = date.getDay();
+  let days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  let day = days[dayIndex];
+  return ` ${day}`;
 }
 
 getCurrentPosition();
@@ -129,18 +168,13 @@ function showPosition(position) {
 
   axios.get(apiUrl)
     .then(function (weatherResponse) {
-      // Exibir dados do tempo
       displayWeather(weatherResponse);
 
-      // Fazer a chamada para obter dados atuais da cidade
       axios.get(currentWeatherUrl)
         .then(function (currentWeatherResponse) {
           const cityName = currentWeatherResponse.data.name;
 
-          // Exibir o nome da cidade
           document.querySelector("#city").innerHTML = cityName;
-
-          // Agora, dentro do mesmo bloco, faça a chamada para obter a previsão
           axios.get(apiUrl)
             .then(displayForecast)
             .catch(function (error) {
@@ -170,7 +204,7 @@ function displayForecast(response) {
       forecastHtml +=
         `
           <div class="weather-forecast-day">
-            <div class="weather-forecast-date">${formatDate(day.dt * 1000)}</div>
+            <div class="weather-forecast-date">${formatDay(day.dt * 1000)}</div>
             <img src="http://openweathermap.org/img/wn/${day.weather[0].icon}.png" class="weather-forecast-icon" />
             <div class="weather-forecast-temperatures">
               <div class="weather-forecast-temperature">
